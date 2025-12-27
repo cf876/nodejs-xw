@@ -1,607 +1,757 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>红酒世界 | Wine World</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-        }
-        
-        body {
-            background-color: #f9f5f0;
-            color: #333;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        /* 头部样式 */
-        header {
-            background: linear-gradient(rgba(90, 0, 0, 0.8), rgba(60, 0, 0, 0.9)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%235a0000"/><path d="M0,0 L100,100 M100,0 L0,100" stroke="%237a0000" stroke-width="2"/></svg>');
-            color: #fff;
-            padding: 80px 0 40px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        header::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 30px;
-            background: linear-gradient(to bottom right, transparent 49%, #f9f5f0 50%);
-        }
-        
-        .header-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        h1 {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            font-weight: 300;
-            letter-spacing: 2px;
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            opacity: 0.9;
-            font-weight: 300;
-        }
-        
-        /* 导航样式 */
-        nav {
-            background-color: #5a0000;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-        
-        .nav-container {
-            display: flex;
-            justify-content: center;
-        }
-        
-        .nav-links {
-            display: flex;
-            list-style: none;
-        }
-        
-        .nav-links li {
-            margin: 0;
-        }
-        
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            padding: 15px 25px;
-            display: block;
-            transition: background-color 0.3s;
-            font-weight: 300;
-        }
-        
-        .nav-links a:hover {
-            background-color: #7a0000;
-        }
-        
-        /* 主体内容样式 */
-        section {
-            padding: 80px 0;
-        }
-        
-        .section-title {
-            text-align: center;
-            margin-bottom: 60px;
-            color: #5a0000;
-            position: relative;
-        }
-        
-        .section-title::after {
-            content: "";
-            display: block;
-            width: 80px;
-            height: 3px;
-            background-color: #d4af37;
-            margin: 15px auto 0;
-        }
-        
-        .content-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: start;
-        }
-        
-        .content-card {
-            background: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .content-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-        }
-        
-        .card-image {
-            height: 200px;
-            background-color: #5a0000;
-            background-size: cover;
-            background-position: center;
-        }
-        
-        .card-content {
-            padding: 25px;
-        }
-        
-        .card-title {
-            color: #5a0000;
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-            font-weight: 400;
-        }
-        
-        .card-text {
-            color: #555;
-            margin-bottom: 15px;
-        }
-        
-        /* 历史时间线样式 */
-        .timeline {
-            position: relative;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .timeline::before {
-            content: "";
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background-color: #d4af37;
-            transform: translateX(-50%);
-        }
-        
-        .timeline-item {
-            position: relative;
-            margin-bottom: 50px;
-            width: 50%;
-            padding: 0 40px;
-        }
-        
-        .timeline-item:nth-child(odd) {
-            left: 0;
-        }
-        
-        .timeline-item:nth-child(even) {
-            left: 50%;
-        }
-        
-        .timeline-content {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            position: relative;
-        }
-        
-        .timeline-content::after {
-            content: "";
-            position: absolute;
-            top: 20px;
-            width: 20px;
-            height: 20px;
-            background: #fff;
-            transform: rotate(45deg);
-        }
-        
-        .timeline-item:nth-child(odd) .timeline-content::after {
-            right: -10px;
-        }
-        
-        .timeline-item:nth-child(even) .timeline-content::after {
-            left: -10px;
-        }
-        
-        .timeline-year {
-            position: absolute;
-            top: -15px;
-            background: #5a0000;
-            color: #fff;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 300;
-        }
-        
-        .timeline-item:nth-child(odd) .timeline-year {
-            right: -20px;
-        }
-        
-        .timeline-item:nth-child(even) .timeline-year {
-            left: -20px;
-        }
-        
-        /* 葡萄品种样式 */
-        .grape-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 30px;
-        }
-        
-        .grape-card {
-            background: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s;
-        }
-        
-        .grape-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .grape-image {
-            height: 150px;
-            background-color: #7a0000;
-            background-size: cover;
-            background-position: center;
-        }
-        
-        .grape-content {
-            padding: 20px;
-        }
-        
-        .grape-name {
-            color: #5a0000;
-            margin-bottom: 10px;
-            font-size: 1.2rem;
-        }
-        
-        /* 页脚样式 */
-        footer {
-            background-color: #2a0000;
-            color: #fff;
-            padding: 60px 0 30px;
-        }
-        
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-        
-        .footer-column h3 {
-            color: #d4af37;
-            margin-bottom: 20px;
-            font-weight: 400;
-            font-size: 1.2rem;
-        }
-        
-        .footer-links {
-            list-style: none;
-        }
-        
-        .footer-links li {
-            margin-bottom: 10px;
-        }
-        
-        .footer-links a {
-            color: #ccc;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-links a:hover {
-            color: #d4af37;
-        }
-        
-        .copyright {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid #444;
-            color: #999;
-            font-size: 0.9rem;
-        }
-        
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .content-grid {
-                grid-template-columns: 1fr;
+    <title>EcoCycle - Professional Resource Recycling Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10B981', // Emerald green - representing environmental protection
+                        secondary: '#059669',
+                        accent: '#34D399',
+                        dark: '#1F2937',
+                        light: '#F9FAFB'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
             }
-            
-            .timeline::before {
-                left: 30px;
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
             }
-            
-            .timeline-item {
-                width: 100%;
-                padding-left: 80px;
-                padding-right: 0;
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
             }
-            
-            .timeline-item:nth-child(even) {
-                left: 0;
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
             }
-            
-            .timeline-item:nth-child(odd) .timeline-year,
-            .timeline-item:nth-child(even) .timeline-year {
-                left: 10px;
-                right: auto;
+            .btn-primary {
+                @apply bg-primary text-white py-3 px-6 rounded-lg font-semibold transition-all duration-300 hover:bg-secondary hover:shadow-md;
             }
-            
-            .timeline-item:nth-child(odd) .timeline-content::after,
-            .timeline-item:nth-child(even) .timeline-content::after {
-                left: -10px;
-                right: auto;
-            }
-            
-            h1 {
-                font-size: 2.5rem;
-            }
-            
-            .nav-links {
-                flex-direction: column;
+            .btn-outline {
+                @apply border-2 border-primary text-primary py-3 px-6 rounded-lg font-semibold transition-all duration-300 hover:bg-primary hover:text-white;
             }
         }
     </style>
 </head>
-<body>
-    <!-- 头部 -->
-    <header>
-        <div class="container header-content">
-            <h1>红酒世界 | Wine World</h1>
-            <p class="subtitle">探索红酒的优雅与奥秘 | Discover the Elegance and Mystery of Wine</p>
-        </div>
+<body class="font-inter bg-light text-dark antialiased">
+    <!-- Navbar -->
+    <header class="fixed w-full top-0 z-50 transition-all duration-300" id="navbar">
+        <nav class="bg-white/95 backdrop-blur-sm shadow-sm py-4 px-4 md:px-8">
+            <div class="container mx-auto flex justify-between items-center">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-2">
+                    <i class="fa-solid fa-recycle text-2xl text-primary"></i>
+                    <span class="text-xl md:text-2xl font-bold text-dark">EcoCycle</span>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#home" class="font-medium hover:text-primary transition-colors">Home</a>
+                    <a href="#about" class="font-medium hover:text-primary transition-colors">About Us</a>
+                    <a href="#services" class="font-medium hover:text-primary transition-colors">Services</a>
+                    <a href="#guide" class="font-medium hover:text-primary transition-colors">Recycling Guide</a>
+                    <a href="#contact" class="font-medium hover:text-primary transition-colors">Contact</a>
+                </div>
+
+                <!-- CTA Button (Desktop) -->
+                <a href="#contact" class="hidden md:block btn-primary">
+                    Book a Pickup
+                </a>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="md:hidden text-dark text-xl" id="mobileMenuToggle">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation Menu -->
+            <div class="md:hidden hidden bg-white border-t mt-4 py-4 px-4" id="mobileMenu">
+                <div class="flex flex-col gap-4">
+                    <a href="#home" class="font-medium hover:text-primary transition-colors py-2">Home</a>
+                    <a href="#about" class="font-medium hover:text-primary transition-colors py-2">About Us</a>
+                    <a href="#services" class="font-medium hover:text-primary transition-colors py-2">Services</a>
+                    <a href="#guide" class="font-medium hover:text-primary transition-colors py-2">Recycling Guide</a>
+                    <a href="#contact" class="font-medium hover:text-primary transition-colors py-2">Contact</a>
+                    <a href="#contact" class="btn-primary w-full text-center mt-2">
+                        Book a Pickup
+                    </a>
+                </div>
+            </div>
+        </nav>
     </header>
 
-    <!-- 导航 -->
-    <nav>
-        <div class="container nav-container">
-            <ul class="nav-links">
-                <li><a href="#intro">红酒简介 | Introduction</a></li>
-                <li><a href="#history">历史渊源 | History</a></li>
-                <li><a href="#types">红酒分类 | Types</a></li>
-                <li><a href="#grapes">葡萄品种 | Grapes</a></li>
-                <li><a href="#tasting">品鉴艺术 | Tasting</a></li>
-            </ul>
+    <!-- Hero Section -->
+    <section id="home" class="pt-28 pb-20 md:pt-36 md:pb-32 px-4 md:px-8 bg-gradient-to-b from-white to-emerald-50">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div class="order-2 md:order-1">
+                <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight text-shadow mb-6">
+                    Turn Your <span class="text-primary">Waste</span> Into Valuable Resources
+                </h1>
+                <p class="text-lg text-gray-600 mb-8 max-w-lg">
+                    EcoCycle provides professional resource recycling services for households and businesses, helping you reduce environmental impact while earning extra income.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="#services" class="btn-primary">
+                        Explore Services
+                    </a>
+                    <a href="#guide" class="btn-outline">
+                        Learn More
+                    </a>
+                </div>
+                <div class="mt-10 flex items-center gap-6">
+                    <div class="flex -space-x-2">
+                        <img src="https://picsum.photos/40/40" alt="Customer" class="w-10 h-10 rounded-full border-2 border-white">
+                        <img src="https://picsum.photos/41/41" alt="Customer" class="w-10 h-10 rounded-full border-2 border-white">
+                        <img src="https://picsum.photos/42/42" alt="Customer" class="w-10 h-10 rounded-full border-2 border-white">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border-2 border-white text-primary font-semibold text-xs">
+                            2k+
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1 text-yellow-500">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star-half-stroke"></i>
+                            <span class="text-dark font-medium ml-1">4.8/5</span>
+                        </div>
+                        <p class="text-sm text-gray-600">From 2,000+ satisfied customers</p>
+                    </div>
+                </div>
+            </div>
+            <div class="order-1 md:order-2 relative">
+                <div class="relative z-10 rounded-2xl overflow-hidden shadow-2xl">
+                    <img src="https://picsum.photos/600/500" alt="Recycling Service" class="w-full h-auto object-cover">
+                </div>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-primary/20 rounded-2xl -z-10 blur-xl"></div>
+                <!-- Floating Stats -->
+                <div class="absolute top-4 -left-4 bg-white p-4 rounded-lg shadow-lg card-hover">
+                    <p class="text-2xl font-bold text-primary">98%</p>
+                    <p class="text-sm text-gray-600">Recycling Rate</p>
+                </div>
+                <div class="absolute -bottom-4 right-8 bg-white p-4 rounded-lg shadow-lg card-hover">
+                    <p class="text-2xl font-bold text-primary">15+</p>
+                    <p class="text-sm text-gray-600">Recyclable Materials</p>
+                </div>
+            </div>
         </div>
-    </nav>
+    </section>
 
-    <!-- 主体内容 -->
-    <main class="container">
-        <!-- 红酒简介 -->
-        <section id="intro">
-            <h2 class="section-title">红酒简介 | Introduction</h2>
-            <div class="content-grid">
-                <div class="content-card">
-                    <div class="card-image" style="background-color: #7a0000;"></div>
-                    <div class="card-content">
-                        <h3 class="card-title">什么是红酒？ | What is Red Wine?</h3>
-                        <p class="card-text">Red wine is an alcoholic beverage made from dark-colored grape varieties. The color of red wine ranges from intense violet, typical of young wines, to brick red for mature wines and brown for older red wines.</p>
-                        <p class="card-text">红酒是由深色葡萄品种酿制而成的酒精饮料。红酒的颜色从年轻葡萄酒典型的深紫色，到成熟葡萄酒的砖红色，再到陈年葡萄酒的棕色。</p>
+    <!-- About Section -->
+    <section id="about" class="py-20 px-4 md:px-8 bg-white">
+        <div class="container mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-[clamp(1.8rem,4vw,3rem)] font-bold mb-4">About EcoCycle</h2>
+                <div class="w-20 h-1 bg-primary mx-auto mb-6"></div>
+                <p class="text-gray-600 max-w-2xl mx-auto text-lg">
+                    We are a leading resource recycling company dedicated to creating a sustainable future through innovative waste management solutions.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-emerald-50 rounded-xl p-8 card-hover">
+                    <div class="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fa-solid fa-leaf text-2xl text-primary"></i>
                     </div>
+                    <h3 class="text-xl font-bold mb-4">Our Mission</h3>
+                    <p class="text-gray-600">
+                        To minimize waste and maximize resource utilization by providing efficient, affordable, and eco-friendly recycling services to all communities.
+                    </p>
                 </div>
-                <div class="content-card">
-                    <div class="card-image" style="background-color: #5a0000;"></div>
-                    <div class="card-content">
-                        <h3 class="card-title">酿造过程 | Winemaking Process</h3>
-                        <p class="card-text">The process of making red wine involves harvesting grapes, crushing and destemming, fermentation, pressing, aging, and bottling. The key difference from white wine production is that red wine fermentation includes the grape skins, which impart color, tannins, and flavor.</p>
-                        <p class="card-text">红酒的酿造过程包括采摘葡萄、压榨去梗、发酵、压榨、陈酿和装瓶。与白葡萄酒生产的主要区别在于，红葡萄酒的发酵包括葡萄皮，这赋予了颜色、单宁和风味。</p>
+
+                <div class="bg-emerald-50 rounded-xl p-8 card-hover">
+                    <div class="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fa-solid fa-trophy text-2xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Our Vision</h3>
+                    <p class="text-gray-600">
+                        To build a zero-waste society where every piece of waste is transformed into a valuable resource, contributing to environmental sustainability.
+                    </p>
+                </div>
+
+                <div class="bg-emerald-50 rounded-xl p-8 card-hover">
+                    <div class="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fa-solid fa-handshake text-2xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Our Values</h3>
+                    <p class="text-gray-600">
+                        Sustainability, integrity, innovation, and customer satisfaction are the core values that guide every decision and action we take.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-16 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-2xl p-8 md:p-12">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+                    <div>
+                        <p class="text-4xl md:text-5xl font-bold text-primary mb-2">10+</p>
+                        <p class="text-gray-600 font-medium">Years of Experience</p>
+                    </div>
+                    <div>
+                        <p class="text-4xl md:text-5xl font-bold text-primary mb-2">50k+</p>
+                        <p class="text-gray-600 font-medium">Tons Recycled</p>
+                    </div>
+                    <div>
+                        <p class="text-4xl md:text-5xl font-bold text-primary mb-2">20+</p>
+                        <p class="text-gray-600 font-medium">Cities Served</p>
+                    </div>
+                    <div>
+                        <p class="text-4xl md:text-5xl font-bold text-primary mb-2">5k+</p>
+                        <p class="text-gray-600 font-medium">Happy Clients</p>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- 历史渊源 -->
-        <section id="history">
-            <h2 class="section-title">历史渊源 | History</h2>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-year">6000 BC</div>
-                    <div class="timeline-content">
-                        <h3>早期起源 | Early Origins</h3>
-                        <p>Evidence of early wine production dates back to 6000 BC in Georgia. The earliest known winery was discovered in Armenia, dating to around 4100 BC.</p>
-                        <p>早期葡萄酒生产的证据可以追溯到公元前6000年的格鲁吉亚。已知最早的酿酒厂在亚美尼亚发现，可追溯到公元前4100年左右。</p>
+    <!-- Services Section -->
+    <section id="services" class="py-20 px-4 md:px-8 bg-emerald-50">
+        <div class="container mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-[clamp(1.8rem,4vw,3rem)] font-bold mb-4">Our Recycling Services</h2>
+                <div class="w-20 h-1 bg-primary mx-auto mb-6"></div>
+                <p class="text-gray-600 max-w-2xl mx-auto text-lg">
+                    We offer a comprehensive range of recycling services tailored to meet the needs of both residential and commercial clients.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Service Card 1 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-md card-hover">
+                    <img src="https://picsum.photos/400/300?1" alt="Paper Recycling" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-3">Paper & Cardboard Recycling</h3>
+                        <p class="text-gray-600 mb-4">
+                            We recycle all types of paper products including office paper, newspapers, magazines, and cardboard boxes with 100% material recovery.
+                        </p>
+                        <a href="#" class="text-primary font-semibold flex items-center gap-2 hover:underline">
+                            Learn More <i class="fa-solid fa-arrow-right text-sm"></i>
+                        </a>
                     </div>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-year">Roman Era</div>
-                    <div class="timeline-content">
-                        <h3>罗马时期 | Roman Era</h3>
-                        <p>The Romans significantly advanced viticulture and winemaking techniques, establishing vineyards throughout their empire, including in France, Spain, and Germany.</p>
-                        <p>罗马人显著推进了葡萄栽培和酿酒技术，在整个帝国建立了葡萄园，包括法国、西班牙和德国。</p>
+
+                <!-- Service Card 2 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-md card-hover">
+                    <img src="https://picsum.photos/400/300?2" alt="Plastic Recycling" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-3">Plastic Recycling</h3>
+                        <p class="text-gray-600 mb-4">
+                            Specialized recycling for all plastic types (PET, HDPE, PVC, etc.), transforming plastic waste into new raw materials for manufacturing.
+                        </p>
+                        <a href="#" class="text-primary font-semibold flex items-center gap-2 hover:underline">
+                            Learn More <i class="fa-solid fa-arrow-right text-sm"></i>
+                        </a>
                     </div>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-year">Middle Ages</div>
-                    <div class="timeline-content">
-                        <h3>中世纪 | Middle Ages</h3>
-                        <p>During the Middle Ages, the Catholic Church became a staunch supporter of wine production, as wine was necessary for the celebration of Mass. Monastic orders preserved and developed winemaking knowledge.</p>
-                        <p>在中世纪，天主教会成为葡萄酒生产的坚定支持者，因为葡萄酒是庆祝弥撒所必需的。修道会保存并发展了酿酒知识。</p>
+
+                <!-- Service Card 3 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-md card-hover">
+                    <img src="https://picsum.photos/400/300?3" alt="Metal Recycling" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-3">Metal Recycling</h3>
+                        <p class="text-gray-600 mb-4">
+                            Professional recycling of ferrous and non-ferrous metals (aluminum, copper, steel, iron) with competitive pricing and convenient pickup.
+                        </p>
+                        <a href="#" class="text-primary font-semibold flex items-center gap-2 hover:underline">
+                            Learn More <i class="fa-solid fa-arrow-right text-sm"></i>
+                        </a>
                     </div>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-year">19th Century</div>
-                    <div class="timeline-content">
-                        <h3>现代发展 | Modern Development</h3>
-                        <p>The 19th century saw major developments in wine technology, including pasteurization and understanding of fermentation. This period also saw the spread of European grape varieties to New World wine regions.</p>
-                        <p>19世纪见证了葡萄酒技术的重大发展，包括巴氏杀菌法和发酵原理的理解。这一时期也见证了欧洲葡萄品种向新世界葡萄酒产区的传播。</p>
+
+                <!-- Service Card 4 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-md card-hover">
+                    <img src="https://picsum.photos/400/300?4" alt="Glass Recycling" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-3">Glass Recycling</h3>
+                        <p class="text-gray-600 mb-4">
+                            Color-sorted glass recycling service that preserves the quality of glass materials and reduces energy consumption in glass production.
+                        </p>
+                        <a href="#" class="text-primary font-semibold flex items-center gap-2 hover:underline">
+                            Learn More <i class="fa-solid fa-arrow-right text-sm"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Service Card 5 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-md card-hover">
+                    <img src="https://picsum.photos/400/300?5" alt="Electronic Waste" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-3">Electronic Waste Recycling</h3>
+                        <p class="text-gray-600 mb-4">
+                            Safe and environmentally friendly e-waste recycling for old electronics, including computers, phones, TVs, and other electronic devices.
+                        </p>
+                        <a href="#" class="text-primary font-semibold flex items-center gap-2 hover:underline">
+                            Learn More <i class="fa-solid fa-arrow-right text-sm"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Service Card 6 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-md card-hover">
+                    <img src="https://picsum.photos/400/300?6" alt="Commercial Recycling" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-3">Commercial Recycling Solutions</h3>
+                        <p class="text-gray-600 mb-4">
+                            Customized recycling programs for businesses, offices, and industrial facilities with regular pickup and detailed waste audit reports.
+                        </p>
+                        <a href="#" class="text-primary font-semibold flex items-center gap-2 hover:underline">
+                            Learn More <i class="fa-solid fa-arrow-right text-sm"></i>
+                        </a>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- 红酒分类 -->
-        <section id="types">
-            <h2 class="section-title">红酒分类 | Types</h2>
-            <div class="content-grid">
-                <div class="content-card">
-                    <div class="card-image" style="background-color: #8b0000;"></div>
-                    <div class="card-content">
-                        <h3 class="card-title">轻酒体红酒 | Light-Bodied Reds</h3>
-                        <p class="card-text">Light-bodied red wines have fewer tannins and lower alcohol content. They are typically bright, fresh, and easy to drink. Examples include Pinot Noir, Gamay, and Grenache.</p>
-                        <p class="card-text">轻酒体红葡萄酒单宁较少，酒精含量较低。它们通常明亮、清新且易于饮用。例子包括黑皮诺、佳美和歌海娜。</p>
-                    </div>
+            <div class="mt-12 text-center">
+                <a href="#contact" class="btn-primary inline-block">
+                    Request a Custom Service
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recycling Guide Section -->
+    <section id="guide" class="py-20 px-4 md:px-8 bg-white">
+        <div class="container mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-[clamp(1.8rem,4vw,3rem)] font-bold mb-4">Recycling Guide</h2>
+                <div class="w-20 h-1 bg-primary mx-auto mb-6"></div>
+                <p class="text-gray-600 max-w-2xl mx-auto text-lg">
+                    Follow our simple step-by-step guide to ensure your waste is properly sorted and recycled, maximizing its value and environmental benefit.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
+                <div>
+                    <img src="https://picsum.photos/600/400" alt="Recycling Steps" class="w-full h-auto rounded-xl shadow-lg">
                 </div>
-                <div class="content-card">
-                    <div class="card-image" style="background-color: #800000;"></div>
-                    <div class="card-content">
-                        <h3 class="card-title">中等酒体红酒 | Medium-Bodied Reds</h3>
-                        <p class="card-text">Medium-bodied reds strike a balance between light and full-bodied wines. They offer more complexity than light-bodied wines but are not as heavy as full-bodied ones. Examples include Merlot, Sangiovese, and Zinfandel.</p>
-                        <p class="card-text">中等酒体红葡萄酒在轻酒体和重酒体葡萄酒之间取得平衡。它们比轻酒体葡萄酒提供更多的复杂性，但不像重酒体葡萄酒那样厚重。例子包括梅洛、桑娇维塞和仙粉黛。</p>
-                    </div>
-                </div>
-                <div class="content-card">
-                    <div class="card-image" style="background-color: #660000;"></div>
-                    <div class="card-content">
-                        <h3 class="card-title">重酒体红酒 | Full-Bodied Reds</h3>
-                        <p class="card-text">Full-bodied red wines are rich, robust, and high in tannins and alcohol. They often benefit from aging and pair well with hearty foods. Examples include Cabernet Sauvignon, Syrah, and Malbec.</p>
-                        <p class="card-text">重酒体红葡萄酒浓郁、醇厚，单宁和酒精含量高。它们通常受益于陈年，并与丰盛的食物搭配良好。例子包括赤霞珠、西拉和马尔贝克。</p>
-                    </div>
-                </div>
-                <div class="content-card">
-                    <div class="card-image" style="background-color: #4d0000;"></div>
-                    <div class="card-content">
-                        <h3 class="card-title">甜红葡萄酒 | Sweet Red Wines</h3>
-                        <p class="card-text">Sweet red wines have noticeable residual sugar, making them sweet to taste. They range from slightly sweet to very sweet and are often served with desserts or as dessert themselves. Examples include Port, Brachetto d'Acqui, and Recioto della Valpolicella.</p>
-                        <p class="card-text">甜红葡萄酒有明显的残留糖分，使它们尝起来甜美。它们从微甜到非常甜不等，通常与甜点一起供应或作为甜点本身。例子包括波特酒、布拉凯托达魁和雷乔托瓦坡里切拉。</p>
+                <div>
+                    <h3 class="text-2xl font-bold mb-8">4 Simple Steps to Recycle With Us</h3>
+                    <div class="space-y-6">
+                        <!-- Step 1 -->
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                <span class="text-primary font-bold text-xl">1</span>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-semibold mb-2">Sort Your Waste</h4>
+                                <p class="text-gray-600">
+                                    Separate your waste into different categories (paper, plastic, metal, glass, e-waste) using our color-coded bins.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                <span class="text-primary font-bold text-xl">2</span>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-semibold mb-2">Book a Pickup</h4>
+                                <p class="text-gray-600">
+                                    Schedule a convenient pickup time through our website or phone, or drop off your recyclables at our nearest center.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                <span class="text-primary font-bold text-xl">3</span>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-semibold mb-2">We Collect & Process</h4>
+                                <p class="text-gray-600">
+                                    Our team will collect your recyclables and transport them to our state-of-the-art processing facility for sorting and recycling.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Step 4 -->
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                <span class="text-primary font-bold text-xl">4</span>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-semibold mb-2">Get Rewarded</h4>
+                                <p class="text-gray-600">
+                                    Receive competitive compensation for your recyclable materials, or enjoy tax benefits for commercial recycling programs.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- 葡萄品种 -->
-        <section id="grapes">
-            <h2 class="section-title">主要葡萄品种 | Major Grape Varieties</h2>
-            <div class="grape-grid">
-                <div class="grape-card">
-                    <div class="grape-image" style="background-color: #7a0000;"></div>
-                    <div class="grape-content">
-                        <h3 class="grape-name">赤霞珠 | Cabernet Sauvignon</h3>
-                        <p>One of the world's most widely recognized red wine grape varieties, known for its thick, durable skin and the vine's resistance to the elements.</p>
-                        <p>世界上最广泛认可的红葡萄酒葡萄品种之一，以其厚实耐用的果皮和藤蔓对环境的抵抗力而闻名。</p>
-                    </div>
+            <!-- Recyclable Materials Table -->
+            <div class="bg-emerald-50 rounded-xl p-6 md:p-8 shadow-sm">
+                <h3 class="text-2xl font-bold mb-6 text-center">Recyclable & Non-Recyclable Materials</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[768px] border-collapse">
+                        <thead>
+                            <tr class="bg-primary text-white">
+                                <th class="py-4 px-6 text-left rounded-tl-lg">Material Type</th>
+                                <th class="py-4 px-6 text-left">Recyclable</th>
+                                <th class="py-4 px-6 text-left rounded-tr-lg">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr class="bg-white hover:bg-emerald-50 transition-colors">
+                                <td class="py-4 px-6 font-medium">Paper & Cardboard</td>
+                                <td class="py-4 px-6 text-green-600 font-semibold">Yes</td>
+                                <td class="py-4 px-6 text-gray-600">Remove food contamination & non-paper attachments</td>
+                            </tr>
+                            <tr class="bg-white hover:bg-emerald-50 transition-colors">
+                                <td class="py-4 px-6 font-medium">Plastic Bottles & Containers</td>
+                                <td class="py-4 px-6 text-green-600 font-semibold">Yes</td>
+                                <td class="py-4 px-6 text-gray-600">Rinse clean and remove caps (caps are recyclable separately)</td>
+                            </tr>
+                            <tr class="bg-white hover:bg-emerald-50 transition-colors">
+                                <td class="py-4 px-6 font-medium">Aluminum & Steel Cans</td>
+                                <td class="py-4 px-6 text-green-600 font-semibold">Yes</td>
+                                <td class="py-4 px-6 text-gray-600">Rinse clean and crush to save space</td>
+                            </tr>
+                            <tr class="bg-white hover:bg-emerald-50 transition-colors">
+                                <td class="py-4 px-6 font-medium">Glass Jars & Bottles</td>
+                                <td class="py-4 px-6 text-green-600 font-semibold">Yes</td>
+                                <td class="py-4 px-6 text-gray-600">Rinse clean and sort by color (clear, green, brown)</td>
+                            </tr>
+                            <tr class="bg-white hover:bg-emerald-50 transition-colors">
+                                <td class="py-4 px-6 font-medium">Food Waste</td>
+                                <td class="py-4 px-6 text-red-600 font-semibold">No (compostable only)</td>
+                                <td class="py-4 px-6 text-gray-600">Can be composted but not recycled with standard materials</td>
+                            </tr>
+                            <tr class="bg-white hover:bg-emerald-50 transition-colors">
+                                <td class="py-4 px-6 font-medium">Plastic Bags & Films</td>
+                                <td class="py-4 px-6 text-red-600 font-semibold">No (special collection only)</td>
+                                <td class="py-4 px-6 text-gray-600">Drop off at designated retail collection points only</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="grape-card">
-                    <div class="grape-image" style="background-color: #8b0000;"></div>
-                    <div class="grape-content">
-                        <h3 class="grape-name">梅洛 | Merlot</h3>
-                        <p>A dark blue-colored wine grape variety that is used as both a blending grape and for varietal wines.</p>
-                        <p>一种深蓝色的葡萄酒葡萄品种，既用作混合葡萄，也用于酿造单一品种葡萄酒。</p>
-                    </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 px-4 md:px-8 bg-emerald-50">
+        <div class="container mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-[clamp(1.8rem,4vw,3rem)] font-bold mb-4">Contact Us</h2>
+                <div class="w-20 h-1 bg-primary mx-auto mb-6"></div>
+                <p class="text-gray-600 max-w-2xl mx-auto text-lg">
+                    Have questions about our services or want to book a pickup? Get in touch with us using the form below or our contact information.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Contact Form -->
+                <div class="bg-white rounded-xl p-8 shadow-md">
+                    <h3 class="text-2xl font-bold mb-6">Send Us a Message</h3>
+                    <form class="space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label for="name" class="block text-gray-700 font-medium mb-2">Full Name</label>
+                                <input type="text" id="name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="John Doe" required>
+                            </div>
+                            <div>
+                                <label for="email" class="block text-gray-700 font-medium mb-2">Email Address</label>
+                                <input type="email" id="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="john@example.com" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="phone" class="block text-gray-700 font-medium mb-2">Phone Number</label>
+                            <input type="tel" id="phone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="+1 (123) 456-7890" required>
+                        </div>
+                        <div>
+                            <label for="service" class="block text-gray-700 font-medium mb-2">Service Interest</label>
+                            <select id="service" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                                <option value="" disabled selected>Select a service</option>
+                                <option value="paper">Paper & Cardboard Recycling</option>
+                                <option value="plastic">Plastic Recycling</option>
+                                <option value="metal">Metal Recycling</option>
+                                <option value="glass">Glass Recycling</option>
+                                <option value="e-waste">Electronic Waste Recycling</option>
+                                <option value="commercial">Commercial Recycling Solutions</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="message" class="block text-gray-700 font-medium mb-2">Message</label>
+                            <textarea id="message" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Tell us about your requirements..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary w-full">
+                            Send Message
+                        </button>
+                    </form>
                 </div>
-                <div class="grape-card">
-                    <div class="grape-image" style="background-color: #900000;"></div>
-                    <div class="grape-content">
-                        <h3 class="grape-name">黑皮诺 | Pinot Noir</h3>
-                        <p>A red wine grape variety of the species Vitis vinifera. The name may also refer to wines created predominantly from Pinot Noir grapes.</p>
-                        <p>一种属于欧亚葡萄种类的红葡萄酒葡萄品种。该名称也可能指主要由黑皮诺葡萄酿造的葡萄酒。</p>
+
+                <!-- Contact Information -->
+                <div class="space-y-8">
+                    <div class="bg-white rounded-xl p-8 shadow-md card-hover">
+                        <div class="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-location-dot text-2xl text-primary"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Our Location</h3>
+                        <p class="text-gray-600 mb-4">
+                            123 Eco Street, Green Valley, CA 90210, United States
+                        </p>
+                        <a href="#" class="text-primary font-semibold hover:underline flex items-center gap-2">
+                            View on Map <i class="fa-solid fa-map-marker-alt text-sm"></i>
+                        </a>
                     </div>
-                </div>
-                <div class="grape-card">
-                    <div class="grape-image" style="background-color: #a00000;"></div>
-                    <div class="grape-content">
-                        <h3 class="grape-name">西拉 | Syrah/Shiraz</h3>
-                        <p>A dark-skinned grape variety grown throughout the world and used primarily to produce red wine.</p>
-                        <p>一种在世界各地种植的深色葡萄品种，主要用于生产红葡萄酒。</p>
+
+                    <div class="bg-white rounded-xl p-8 shadow-md card-hover">
+                        <div class="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-phone text-2xl text-primary"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Contact Details</h3>
+                        <div class="space-y-3 text-gray-600">
+                            <p class="flex items-center gap-3">
+                                <i class="fa-solid fa-phone-volume text-primary"></i>
+                                <span>+1 (123) 456-7890</span>
+                            </p>
+                            <p class="flex items-center gap-3">
+                                <i class="fa-solid fa-envelope text-primary"></i>
+                                <span>info@ecocycle.com</span>
+                            </p>
+                            <p class="flex items-center gap-3">
+                                <i class="fa-solid fa-clock text-primary"></i>
+                                <span>Monday - Friday: 8:00 AM - 6:00 PM</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-8 shadow-md card-hover">
+                        <div class="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-share-nodes text-2xl text-primary"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Follow Us</h3>
+                        <div class="flex gap-4">
+                            <a href="#" class="w-12 h-12 bg-facebook/10 rounded-full flex items-center justify-center text-facebook hover:bg-facebook hover:text-white transition-all duration-300">
+                                <i class="fa-brands fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="w-12 h-12 bg-twitter/10 rounded-full flex items-center justify-center text-twitter hover:bg-twitter hover:text-white transition-all duration-300">
+                                <i class="fa-brands fa-twitter"></i>
+                            </a>
+                            <a href="#" class="w-12 h-12 bg-instagram/10 rounded-full flex items-center justify-center text-instagram hover:bg-instagram hover:text-white transition-all duration-300">
+                                <i class="fa-brands fa-instagram"></i>
+                            </a>
+                            <a href="#" class="w-12 h-12 bg-linkedin/10 rounded-full flex items-center justify-center text-linkedin hover:bg-linkedin hover:text-white transition-all duration-300">
+                                <i class="fa-brands fa-linkedin-in"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- 品鉴艺术 -->
-        <section id="tasting">
-            <h2 class="section-title">品鉴艺术 | The Art of Tasting</h2>
-            <div class="content-grid">
-                <div class="content-card">
-                    <div class="card-image" style="background-color: #5a0000;"></div>
-                    <div class="card-content">
-                        <h3 class="card-title">视觉评估 | Visual Examination</h3>
-                        <p class="card-text">Observe the wine's color, intensity, and viscosity. Tilt the glass against a white background to better see the color gradient from the center to the rim.</p>
-                        <p class="card-text">观察葡萄酒的颜色、强度和粘度。将酒杯倾斜对着白色背景，以更好地看到从中心到边缘的颜色渐变。</p>
-                    </div>
-                </div>
-                <div class="content-card">
-                    <div class="card-image" style="background-color: #6a0000;"></div>
-                    <div class="card-content">
-                        <h3 class="card-title">嗅觉体验 | Olfactory Experience</h3>
-                        <p class="card-text">Gently swirl the wine in your glass to release its aromas. Take a series of short sniffs to identify the various scent notes, from fruity to earthy, floral to spicy.</p>
-                        <p class="card-text">轻轻旋转酒杯中的葡萄酒以释放其香气。进行一系列短暂的嗅闻，以识别各种香气，从果香到土香，从花香到香料味。</p>
-                    </div>
-                </div>
-                <div class="content-card">
-                    <div class="card-image" style="background-color: #7a0000;"></div>
-                    <div class="card-content">
-                        <h3 class="card-title">味觉感受 | Taste Sensation</h3>
-                        <p class="card-text">Take a small sip and let the wine spread across your palate. Identify the primary tastes: sweetness, acidity, bitterness, and saltiness, along with the wine's body and tannin structure.</p>
-                        <p class="card-text">小酌一口，让葡萄酒在口中扩散。识别主要味道：甜味、酸味、苦味和咸味，以及葡萄酒的酒体和单宁结构。</p>
-                    </div>
-                </div>
-                <div class="content-card">
-                    <div class="card-image" style="background-color: #8a0000;"></div>
-                    <div class="card-content">
-                        <h3 class="card-title">余韵与评价 | Finish and Evaluation</h3>
-                        <p class="card-text">Pay attention to the aftertaste or finish. How long do the flavors persist? Consider the wine's balance, complexity, and overall quality before forming your final assessment.</p>
-                        <p class="card-text">注意余味或回味。风味持续多长时间？在形成最终评估之前，考虑葡萄酒的平衡度、复杂性和整体质量。</p>
-                    </div>
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-16 px-4 md:px-8">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+            <!-- Company Info -->
+            <div>
+                <a href="#" class="flex items-center gap-2 mb-6">
+                    <i class="fa-solid fa-recycle text-2xl text-primary"></i>
+                    <span class="text-xl font-bold">EcoCycle</span>
+                </a>
+                <p class="text-gray-400 mb-6">
+                    We are committed to creating a sustainable future through innovative and efficient resource recycling solutions for all.
+                </p>
+                <div class="flex gap-4">
+                    <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                        <i class="fa-brands fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                        <i class="fa-brands fa-linkedin-in"></i>
+                    </a>
                 </div>
             </div>
-        </section>
-    </main>
 
-    <!-- 页脚 -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h3>关于我们 | About Us</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">我们的故事 | Our Story</a></li>
-                        <li><a href="#">团队介绍 | Our Team</a></li>
-                        <li><a href="#">联系方式 | Contact Us</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>红酒知识 | Wine Knowledge</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">酿造工艺 | Winemaking</a></li>
-                        <li><a href="#">产区介绍 | Regions</a></li>
-                        <li><a href="#">搭配指南 | Pairing Guide</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>关注我们 | Follow Us</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">微信 | WeChat</a></li>
-                        <li><a href="#">微博 | Weibo</a></li>
-                        <li><a href="#">Instagram</a></li>
-                    </ul>
-                </div>
+            <!-- Quick Links -->
+            <div>
+                <h4 class="text-lg font-bold mb-6">Quick Links</h4>
+                <ul class="space-y-4">
+                    <li>
+                        <a href="#home" class="text-gray-400 hover:text-primary transition-colors">Home</a>
+                    </li>
+                    <li>
+                        <a href="#about" class="text-gray-400 hover:text-primary transition-colors">About Us</a>
+                    </li>
+                    <li>
+                        <a href="#services" class="text-gray-400 hover:text-primary transition-colors">Services</a>
+                    </li>
+                    <li>
+                        <a href="#guide" class="text-gray-400 hover:text-primary transition-colors">Recycling Guide</a>
+                    </li>
+                    <li>
+                        <a href="#contact" class="text-gray-400 hover:text-primary transition-colors">Contact</a>
+                    </li>
+                </ul>
             </div>
-            <div class="copyright">
-                <p>&copy; 2023 红酒世界 | Wine World. 保留所有权利 | All rights reserved.</p>
+
+            <!-- Services -->
+            <div>
+                <h4 class="text-lg font-bold mb-6">Our Services</h4>
+                <ul class="space-y-4">
+                    <li>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">Paper & Cardboard Recycling</a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">Plastic Recycling</a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">Metal Recycling</a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">Glass Recycling</a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">Electronic Waste Recycling</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Newsletter -->
+            <div>
+                <h4 class="text-lg font-bold mb-6">Newsletter</h4>
+                <p class="text-gray-400 mb-4">
+                    Subscribe to our newsletter for the latest updates and tips on recycling.
+                </p>
+                <form class="flex">
+                    <input type="email" placeholder="Your email" class="flex-1 px-4 py-3 bg-gray-800 text-white rounded-l-lg focus:outline-none focus:ring-1 focus:ring-primary">
+                    <button type="submit" class="bg-primary text-white px-4 py-3 rounded-r-lg hover:bg-secondary transition-colors">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="container mx-auto border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-gray-400 mb-4 md:mb-0">
+                &copy; 2025 EcoCycle. All rights reserved.
+            </p>
+            <div class="flex gap-6">
+                <a href="#" class="text-gray-400 hover:text-primary transition-colors">Privacy Policy</a>
+                <a href="#" class="text-gray-400 hover:text-primary transition-colors">Terms of Service</a>
+                <a href="#" class="text-gray-400 hover:text-primary transition-colors">Cookie Policy</a>
             </div>
         </div>
     </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="fixed bottom-8 right-8 bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg opacity-0 invisible transition-all duration-300 hover:bg-secondary">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <!-- JavaScript -->
+    <script>
+        // Navbar Scroll Effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-md');
+                navbar.classList.remove('py-4');
+                navbar.classList.add('py-2');
+            } else {
+                navbar.classList.remove('shadow-md');
+                navbar.classList.add('py-4');
+                navbar.classList.remove('py-2');
+            }
+        });
+
+        // Mobile Menu Toggle
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            // Toggle icon between bars and times
+            const icon = mobileMenuToggle.querySelector('i');
+            if (icon.classList.contains('fa-bars')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // Smooth Scrolling for Anchor Links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    // Close mobile menu if open
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        const icon = mobileMenuToggle.querySelector('i');
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                    // Scroll to target
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Back to Top Button
+        const backToTopButton = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopButton.classList.remove('opacity-0', 'invisible');
+                backToTopButton.classList.add('opacity-100', 'visible');
+            } else {
+                backToTopButton.classList.add('opacity-0', 'invisible');
+                backToTopButton.classList.remove('opacity-100', 'visible');
+            }
+        });
+
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Add Facebook, Twitter, Instagram, Linkedin colors
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                .bg-facebook { background-color: #1877F2; }
+                .text-facebook { color: #1877F2; }
+                .bg-twitter { background-color: #1DA1F2; }
+                .text-twitter { color: #1DA1F2; }
+                .bg-instagram { background-color: #E4405F; }
+                .text-instagram { color: #E4405F; }
+                .bg-linkedin { background-color: #0077B5; }
+                .text-linkedin { color: #0077B5; }
+            </style>
+        `);
+    </script>
 </body>
 </html>
