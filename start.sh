@@ -41,7 +41,7 @@ export warp=${warp:-''}
 export name=${name:-''}
 export oap=${oap:-''}
 # 新增：定义转发目标端口，优先使用环境变量PORT，默认3000
-export TARGET_PORT=${PORT:-3000}
+export TARGET_PORT=${PORT:-''}
 v46url="https://icanhazip.com"
 agsbxurl="https://raw.githubusercontent.com/yonggekkk/argosbx/main/argosbx.sh"
 
@@ -1148,8 +1148,8 @@ echo '@reboot sleep 10 && /bin/sh -c "nohup $HOME/agsbx/cloudflared tunnel --url
 fi
 
 # 新增：添加端口转发的开机自启
-echo "@reboot sleep 15 && /bin/sh -c 'if [ -f $HOME/agsbx/port_vm_ws ]; then $(command -v socat) TCP-LISTEN:$(cat $HOME/agsbx/port_vm_ws),reuseaddr,fork TCP:127.0.0.1:$TARGET_PORT > $HOME/agsbx/vmpt_forward.log 2>&1 & fi'" >> /tmp/crontab.tmp
-echo "@reboot sleep 15 && /bin/sh -c 'if [ -f $HOME/agsbx/port_vw ]; then $(command -v socat) TCP-LISTEN:$(cat $HOME/agsbx/port_vw),reuseaddr,fork TCP:127.0.0.1:$TARGET_PORT > $HOME/agsbx/vwpt_forward.log 2>&1 & fi'" >> /tmp/crontab.tmp
+echo "@reboot sleep 15 && /bin/sh -c 'PORT_VM_WS_FILE=\"\$HOME/agsbx/port_vm_ws\"; if [ -f \"\$PORT_VM_WS_FILE\" ]; then SOCAT_CMD=\"\$(command -v socat)\"; SRC_PORT=\"\$(cat \$PORT_VM_WS_FILE)\"; DST_PORT=\"\${TARGET_PORT:-3000}\"; \$SOCAT_CMD TCP-LISTEN:\$SRC_PORT,reuseaddr,fork TCP:127.0.0.1:\$DST_PORT > \$HOME/agsbx/vmpt_forward.log 2>&1 & fi'" >> /tmp/crontab.tmp
+echo "@reboot sleep 15 && /bin/sh -c 'PORT_VW_FILE=\"\$HOME/agsbx/port_vw\"; if [ -f \"\$PORT_VW_FILE\" ]; then SOCAT_CMD=\"\$(command -v socat)\"; SRC_PORT=\"\$(cat \$PORT_VW_FILE)\"; DST_PORT=\"\${TARGET_PORT:-3000}\"; \$SOCAT_CMD TCP-LISTEN:\$SRC_PORT,reuseaddr,fork TCP:127.0.0.1:\$DST_PORT > \$HOME/agsbx/vwpt_forward.log 2>&1 & fi'" >> /tmp/crontab.tmp
 
 fi
 crontab /tmp/crontab.tmp >/dev/null 2>&1
