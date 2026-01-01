@@ -165,7 +165,7 @@ echo "[证书] 已就绪"
 ISP=$(curl -s --max-time 2 https://speed.cloudflare.com/meta 2>/dev/null | awk -F'"' '{print $26"-"$18}' | sed 's/-$//' || echo "Node")
 [ -z "$ISP" ] && ISP="Node"
 
-# ================== 生成 sing-box 配置【提前生成】==================
+# ================== 生成 sing-box 配置【核心修改：屏蔽Reality日志】==================
 echo "[CONFIG] 生成配置..."
 INBOUNDS=""
 
@@ -183,7 +183,8 @@ if [ -n "$TUIC_PORT" ]; then
             \"alpn\": [\"h3\"],
             \"certificate_path\": \"${FILE_PATH}/cert.pem\",
             \"key_path\": \"${FILE_PATH}/private.key\"
-        }
+        },
+        \"log\": {\"level\": \"error\"}
     }"
 fi
 
@@ -201,11 +202,12 @@ if [ -n "$HY2_PORT" ]; then
             \"alpn\": [\"h3\"],
             \"certificate_path\": \"${FILE_PATH}/cert.pem\",
             \"key_path\": \"${FILE_PATH}/private.key\"
-        }
+        },
+        \"log\": {\"level\": \"error\"}
     }"
 fi
 
-# VLESS Reality (TCP)
+# VLESS Reality (TCP) - 核心修改：添加 log: false 屏蔽无效连接日志
 if [ -n "$REALITY_PORT" ]; then
     [ -n "$INBOUNDS" ] && INBOUNDS="${INBOUNDS},"
     INBOUNDS="${INBOUNDS}{
@@ -223,7 +225,8 @@ if [ -n "$REALITY_PORT" ]; then
                 \"private_key\": \"${private_key}\",
                 \"short_id\": [\"\"]
             }
-        }
+        },
+        \"log\": false  # 关键：禁用该入站的所有日志输出
     }"
 fi
 
@@ -238,31 +241,38 @@ INBOUNDS="${INBOUNDS}{
     \"transport\": {
         \"type\": \"ws\",
         \"path\": \"/${UUID}-vless\"
-    }
+    },
+    \"log\": {\"level\": \"error\"}
 }"
 
+# 核心修改：全局日志级别设为 error，且禁用控制台日志输出
 cat > "${FILE_PATH}/config.json" <<CFGEOF
 {
-    "log": {"level": "none"},
+    "log": {
+        "level": "error",
+        "disable_console": true,  // 禁用控制台日志输出
+        "output": "${FILE_PATH}/sing-box.log"  // 日志写入文件，避免控制台刷屏
+    },
     "inbounds": [${INBOUNDS}],
     "outbounds": [{"type": "direct", "tag": "direct"}]
 }
 CFGEOF
 echo "[CONFIG] 配置已生成"
 
-# ================== 启动 sing-box【优先启动，占用公网端口】==================
+# ================== 启动 sing-box【添加日志重定向】==================
 echo "[SING-BOX] 启动中..."
-"$SB_FILE" run -c "${FILE_PATH}/config.json" &
+# 将 sing-box 所有输出重定向到文件，彻底屏蔽控制台日志
+"$SB_FILE" run -c "${FILE_PATH}/config.json" > "${FILE_PATH}/sb-stdout.log" 2>"${FILE_PATH}/sb-stderr.log" &
 SB_PID=$!
 sleep 2
 
 if ! kill -0 $SB_PID 2>/dev/null; then
     echo "[SING-BOX] 启动失败"
-    head -n 2 "${FILE_PATH}/private.key"
+    head -n 10 "${FILE_PATH}/sb-stderr.log"  # 仅显示前10行错误日志
     "$SB_FILE" run -c "${FILE_PATH}/config.json"
     exit 1
 fi
-echo "[SING-BOX] 已启动 PID: $SB_PID"
+echo "[SING-BOX] 已启动 PID: $SB_PID (日志已重定向到文件)"
 
 # ================== HTTP 服务器脚本 + 启动【后启动，用本地端口】==================
 cat > "${FILE_PATH}/server.js" <<JSEOF
@@ -284,11 +294,12 @@ HTTP_PID=$!
 sleep 1
 echo "[HTTP] 订阅服务已启动 (仅本地可访问)"
 
-# ================== 启动 Argo 隧道 ==================
+# ================== 启动 Argo 隧道【日志重定向】==================
 ARGO_LOG="${FILE_PATH}/argo.log"
 ARGO_DOMAIN=""
 
 echo "[Argo] 启动隧道 (HTTP2模式)..."
+# Argo 日志也重定向，避免刷屏
 "$ARGO_FILE" tunnel --edge-ip-version auto --protocol http2 --no-autoupdate --url http://127.0.0.1:${ARGO_PORT} > "$ARGO_LOG" 2>&1 &
 ARGO_PID=$!
 
@@ -353,6 +364,7 @@ if [ "$SINGLE_PORT_MODE" = true ]; then
     echo ""
     echo "公网端口: ${PUBLIC_PORT} (UDP/TCP 共用)"
     echo "本地端口: HTTP订阅=${HTTP_LOCAL_PORT} | Argo本地=${ARGO_PORT}"
+    echo "日志路径: ${FILE_PATH}/sing-box.log (仅记录错误)"
     echo "代理节点:"
     [ -n "$HY2_PORT" ] && echo "  - HY2 (UDP): ${PUBLIC_IP}:${HY2_PORT}"
     [ -n "$TUIC_PORT" ] && echo "  - TUIC (UDP): ${PUBLIC_IP}:${TUIC_PORT}"
@@ -372,5 +384,23 @@ echo "订阅链接: $SUB_URL"
 echo "==================================================="
 echo ""
 
-# ================== 保持运行 ==================
+# ================== 保持运行 & 防止崩溃 ==================
+# 监控进程，自动重启（可选）
+monitor_process() {
+    while true; do
+        if ! kill -0 $SB_PID 2>/dev/null; then
+            echo "[监控] sing-box 进程异常退出，正在重启..."
+            "$SB_FILE" run -c "${FILE_PATH}/config.json" > "${FILE_PATH}/sb-stdout.log" 2>"${FILE_PATH}/sb-stderr.log" &
+            SB_PID=$!
+            echo "[监控] sing-box 已重启 PID: $SB_PID"
+        fi
+        sleep 10
+    done
+}
+
+# 启动进程监控（后台运行）
+monitor_process &
+MONITOR_PID=$!
+
+# 等待主进程
 wait $SB_PID
