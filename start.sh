@@ -18,6 +18,41 @@ CF_DOMAINS=(
     "saas.sin.fan"
 )
 
+# ================== 新增：安装 OpenSSL (兼容 Alpine 系统) ==================
+install_openssl() {
+    echo "[依赖] 检查 OpenSSL 是否安装..."
+    if command -v openssl >/dev/null 2>&1; then
+        echo "[依赖] OpenSSL 已安装"
+        return 0
+    fi
+
+    # 判断系统包管理器并安装
+    if command -v apk >/dev/null 2>&1; then
+        echo "[依赖] 使用 apk 安装 OpenSSL..."
+        apk add --no-cache openssl
+    elif command -v apt >/dev/null 2>&1; then
+        echo "[依赖] 使用 apt 安装 OpenSSL..."
+        apt update && apt install -y openssl
+    elif command -v yum >/dev/null 2>&1; then
+        echo "[依赖] 使用 yum 安装 OpenSSL..."
+        yum install -y openssl
+    else
+        echo "[错误] 无法识别系统包管理器，手动安装 OpenSSL 后重试"
+        exit 1
+    fi
+
+    # 验证安装结果
+    if command -v openssl >/dev/null 2>&1; then
+        echo "[依赖] OpenSSL 安装成功"
+    else
+        echo "[错误] OpenSSL 安装失败"
+        exit 1
+    fi
+}
+
+# 执行 OpenSSL 安装
+install_openssl
+
 # ================== 切换到脚本目录 ==================
 cd "$(dirname "$0")"
 export FILE_PATH="${PWD}/.npm"
@@ -53,29 +88,34 @@ PORT_COUNT=${#AVAILABLE_PORTS[@]}
 [ $PORT_COUNT -eq 0 ] && echo "[错误] 未找到端口" && exit 1
 echo "[端口] 发现 $PORT_COUNT 个: ${AVAILABLE_PORTS[*]}"
 
-# ================== 端口分配逻辑 ==================
+# ================== 端口分配逻辑【核心修改】==================
+# 单端口模式：公网端口同时承载 UDP(HY2/TUIC) + TCP(Reality)
+# Argo WS 使用本地回环端口 8081，不占用公网端口
 if [ $PORT_COUNT -eq 1 ]; then
-    UDP_PORT=${AVAILABLE_PORTS[0]}
+    # 公网单端口：UDP 和 TCP 共用
+    PUBLIC_PORT=${AVAILABLE_PORTS[0]}
     TUIC_PORT=""
     HY2_PORT=""
-    [[ "$SINGLE_PORT_UDP" == "tuic" ]] && TUIC_PORT=$UDP_PORT || HY2_PORT=$UDP_PORT
-    REALITY_PORT=""
-    HTTP_PORT=${AVAILABLE_PORTS[0]}
+    [[ "$SINGLE_PORT_UDP" == "tuic" ]] && TUIC_PORT=$PUBLIC_PORT || HY2_PORT=$PUBLIC_PORT
+    REALITY_PORT=$PUBLIC_PORT  # Reality(TCP) 与 UDP 共用公网端口
+    # Argo WS 本地端口（固定 8081，不占用公网端口）
+    ARGO_PORT=8081
+    # HTTP 订阅服务与公网端口共用（TCP）
+    HTTP_PORT=$PUBLIC_PORT
     SINGLE_PORT_MODE=true
 else
+    # 多端口模式：保持原有逻辑
     TUIC_PORT=${AVAILABLE_PORTS[0]}
     HY2_PORT=${AVAILABLE_PORTS[1]}
     REALITY_PORT=${AVAILABLE_PORTS[0]}
     HTTP_PORT=${AVAILABLE_PORTS[1]}
+    ARGO_PORT=8081
     SINGLE_PORT_MODE=false
 fi
-
-ARGO_PORT=8081
 
 # ================== UUID ==================
 UUID_FILE="${FILE_PATH}/uuid.txt"
 [ -f "$UUID_FILE" ] && UUID=$(cat "$UUID_FILE") || { UUID=$(cat /proc/sys/kernel/random/uuid); echo "$UUID" > "$UUID_FILE"; }
-echo "[UUID] $UUID"
 
 # ================== 架构检测 & 下载 ==================
 ARCH=$(uname -m)
@@ -96,21 +136,20 @@ download_file() {
 download_file "${BASE_URL}/sb" "$SB_FILE"
 download_file "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-${ARGO_ARCH}" "$ARGO_FILE"
 
-# ================== Reality 密钥 ==================
-if [ "$SINGLE_PORT_MODE" = false ]; then
-    echo "[密钥] 检查中..."
-    KEY_FILE="${FILE_PATH}/key.txt"
-    if [ -f "$KEY_FILE" ]; then
-        private_key=$(grep "PrivateKey:" "$KEY_FILE" | awk '{print $2}')
-        public_key=$(grep "PublicKey:" "$KEY_FILE" | awk '{print $2}')
-    else
-        output=$("$SB_FILE" generate reality-keypair)
-        echo "$output" > "$KEY_FILE"
-        private_key=$(echo "$output" | awk '/PrivateKey:/ {print $2}')
-        public_key=$(echo "$output" | awk '/PublicKey:/ {print $2}')
-    fi
-    echo "[密钥] 已就绪"
+# ================== Reality 密钥【强制生成】==================
+# 单端口模式下也需要 Reality 密钥，因此强制生成
+echo "[密钥] 生成 Reality 密钥..."
+KEY_FILE="${FILE_PATH}/key.txt"
+if [ -f "$KEY_FILE" ]; then
+    private_key=$(grep "PrivateKey:" "$KEY_FILE" | awk '{print $2}')
+    public_key=$(grep "PublicKey:" "$KEY_FILE" | awk '{print $2}')
+else
+    output=$("$SB_FILE" generate reality-keypair)
+    echo "$output" > "$KEY_FILE"
+    private_key=$(echo "$output" | awk '/PrivateKey:/ {print $2}')
+    public_key=$(echo "$output" | awk '/PublicKey:/ {print $2}')
 fi
+echo "[密钥] 已就绪"
 
 # ================== 证书生成 ==================
 echo "[证书] 生成中..."
@@ -140,14 +179,14 @@ generate_sub() {
     # HY2 (UDP)
     [ -n "$HY2_PORT" ] && echo "hysteria2://${UUID}@${PUBLIC_IP}:${HY2_PORT}/?sni=www.bing.com&insecure=1#Hysteria2-${ISP}" >> "${FILE_PATH}/list.txt"
     
-    # Reality (TCP)
+    # Reality (TCP) - 单端口模式下已启用
     [ -n "$REALITY_PORT" ] && echo "vless://${UUID}@${PUBLIC_IP}:${REALITY_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.nazhumi.com&fp=chrome&pbk=${public_key}&type=tcp#Reality-${ISP}" >> "${FILE_PATH}/list.txt"
     
-    # Argo VLESS
+    # Argo VLESS - 始终启用
     [ -n "$argo_domain" ] && echo "vless://${UUID}@${BEST_CF_DOMAIN}:443?encryption=none&security=tls&sni=${argo_domain}&type=ws&host=${argo_domain}&path=%2F${UUID}-vless#Argo-${ISP}" >> "${FILE_PATH}/list.txt"
 
     cat "${FILE_PATH}/list.txt" > "${FILE_PATH}/sub.txt"
-echo ""
+    echo ""
     echo "==================================================="
     echo "【直接打印 - 节点信息完整列表】"
     echo "==================================================="
@@ -222,9 +261,10 @@ if [ -n "$HY2_PORT" ]; then
     }"
 fi
 
-# VLESS Reality (TCP)
+# VLESS Reality (TCP) - 单端口模式下已启用
 if [ -n "$REALITY_PORT" ]; then
-    INBOUNDS="${INBOUNDS},{
+    [ -n "$INBOUNDS" ] && INBOUNDS="${INBOUNDS},"
+    INBOUNDS="${INBOUNDS}{
         \"type\": \"vless\",
         \"tag\": \"vless-reality-in\",
         \"listen\": \"::\",
@@ -243,8 +283,9 @@ if [ -n "$REALITY_PORT" ]; then
     }"
 fi
 
-# VLESS for Argo
-INBOUNDS="${INBOUNDS},{
+# VLESS for Argo (本地回环端口)
+INBOUNDS="${INBOUNDS},"
+INBOUNDS="${INBOUNDS}{
     \"type\": \"vless\",
     \"tag\": \"vless-argo-in\",
     \"listen\": \"127.0.0.1\",
@@ -279,7 +320,7 @@ if ! kill -0 $SB_PID 2>/dev/null; then
 fi
 echo "[SING-BOX] 已启动 PID: $SB_PID"
 
-# ================== [修复] Argo 隧道 ==================
+# ================== Argo 隧道 ==================
 ARGO_LOG="${FILE_PATH}/argo.log"
 ARGO_DOMAIN=""
 
@@ -304,11 +345,13 @@ SUB_URL="http://${PUBLIC_IP}:${HTTP_PORT}/sub"
 echo ""
 echo "==================================================="
 if [ "$SINGLE_PORT_MODE" = true ]; then
-    echo "模式: 单端口 (${SINGLE_PORT_UDP^^} + Argo)"
+    echo "模式: 单端口多协议 (${SINGLE_PORT_UDP^^} + Reality + Argo)"
     echo ""
+    echo "公网端口: ${PUBLIC_PORT} (UDP/TCP 共用)"
     echo "代理节点:"
     [ -n "$HY2_PORT" ] && echo "  - HY2 (UDP): ${PUBLIC_IP}:${HY2_PORT}"
     [ -n "$TUIC_PORT" ] && echo "  - TUIC (UDP): ${PUBLIC_IP}:${TUIC_PORT}"
+    echo "  - Reality (TCP): ${PUBLIC_IP}:${REALITY_PORT}"
     [ -n "$ARGO_DOMAIN" ] && echo "  - Argo (WS): ${ARGO_DOMAIN}"
 else
     echo "模式: 多端口 (TUIC + HY2 + Reality + Argo)"
