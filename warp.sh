@@ -40,7 +40,7 @@ download_and_extract() {
 
     if [ ! -f "./$exe_file" ]; then
         echo "正在下载 $exe_file..."
-        wget -v -O "$zip_file" "$url"
+        wget -S -O "$zip_file" "$url"
         
         if [ $? -ne 0 ]; then
             echo "错误: 下载 $zip_file 失败。请检查网络连接或 URL。"
