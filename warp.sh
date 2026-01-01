@@ -40,7 +40,7 @@ download_and_extract() {
 
     if [ ! -f "./$exe_file" ]; then
         echo "正在下载 $exe_file..."
-        wget -S -O "$zip_file" "$url"
+        wget -v -O "$zip_file" "$url"
         
         if [ $? -ne 0 ]; then
             echo "错误: 下载 $zip_file 失败。请检查网络连接或 URL。"
@@ -80,7 +80,7 @@ download_and_extract "$USQUE_URL" "$USQUE_ZIP" "$USQUE_EXE"
 echo "所有准备工作完成，开始运行主程序..."
 while true; do
     echo "正在启动 $MASQUE_PLUS_EXE ..."
-    ./$MASQUE_PLUS_EXE "-bind" "0.0.0.0:1080" "-username" "g7envpwz14b0u55" "--password" "juvytdsdzc225pq" "-endpoint" "162.159.198.2:443" "-sni"  "gitlab.io" "-dns" "1.1.1.1,8.8.8.8,94.140.14.140"
+    ./$MASQUE_PLUS_EXE "-bind" "0.0.0.0:1080" "-username" "g7envpwz14b0u55" "--password" "juvytdsdzc225pq" "-endpoint" "www.bing.com:443" "-sni"  "www.bing.com" "-dns" "1.1.1.1,8.8.8.8,94.140.14.140"
     
     echo "$MASQUE_PLUS_EXE 进程意外退出，10秒后将自动重启..."
     sleep 10
