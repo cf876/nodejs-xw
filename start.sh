@@ -243,7 +243,7 @@ INBOUNDS="${INBOUNDS}{
 
 cat > "${FILE_PATH}/config.json" <<CFGEOF
 {
-    "log": {"level": "warn"},
+    "log": {"level": "error"},
     "inbounds": [${INBOUNDS}],
     "outbounds": [{"type": "direct", "tag": "direct"}]
 }
