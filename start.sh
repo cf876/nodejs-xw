@@ -47,7 +47,7 @@ BEST_CF_DOMAIN=$(select_random_cf_domain)
 echo "[CF优选] $BEST_CF_DOMAIN"
 
 # ================== 获取端口 ==================
-[ -n "$SERVER_PORT" ] && PORTS_STRING="$SERVER_PORT" || PORTS_STRING="7860"
+[ -n "$SERVER_PORT" ] && PORTS_STRING="$SERVER_PORT" || PORTS_STRING=""
 read -ra AVAILABLE_PORTS <<< "$PORTS_STRING"
 PORT_COUNT=${#AVAILABLE_PORTS[@]}
 [ $PORT_COUNT -eq 0 ] && echo "[错误] 未找到端口" && exit 1
