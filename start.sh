@@ -131,7 +131,6 @@ generate_config() {
             \"certificate_path\": \"${FILE_PATH}/cert.pem\",
             \"key_path\": \"${FILE_PATH}/private.key\"
         },
-        \"udp\": true,  # 修复：启用UDP支持
         \"log\": {\"level\": \"fatal\"}
     },{
         \"type\": \"vless\",
